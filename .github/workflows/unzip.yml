@@ -1,32 +1,17 @@
-name: Unzip Archive
-
+name: unzip
 on:
-  push:
-    paths:
-      - '*.zip'
-  workflow_dispatch:      # Позволяет запускать вручную
-
+  workflow_dispatch:
 jobs:
   unzip:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Find and unzip all zip files
-        run: |
-          for zipfile in *.zip; do
-            if [ -f "$zipfile" ]; then
-              echo "Распаковка $zipfile..."
-              unzip -o "$zipfile" -d .
-              rm -f "$zipfile"
-            fi
-          done
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - uses: actions/checkout@v4
+      - run: |
+          unzip -o *.zip || true
+          rm -f *.zip
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Auto-unzip archive"
+          git commit -m "unzip" || true
           git push
